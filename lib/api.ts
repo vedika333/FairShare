@@ -7,7 +7,12 @@ type AuthResponse = {
 
 // Shared helper to read JSON and surface friendly server errors
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, options);
+  let res: Response;
+  try {
+    res = await fetch(url, options);
+  } catch {
+    throw new Error("Couldn't reach the server, try again");
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(data.error ?? "Something went wrong");

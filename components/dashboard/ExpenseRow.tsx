@@ -13,11 +13,11 @@ export function ExpenseRow({ payment, payer, onSelect }: ExpenseRowProps) {
   const avatar = payer?.avatar || initials(payerName);
 
   return (
-    <li className="hairline-row">
+    <li className="hairline-row animate-row-fade-in">
       <button
         type="button"
         onClick={() => onSelect(payment)}
-        className="w-full py-3.5 flex items-center justify-between gap-3 text-left hover:bg-paper/60 transition-colors rounded-xl px-1 cursor-pointer"
+        className="w-full min-h-11 py-3 flex items-center justify-between gap-3 text-left hover:bg-paper/60 transition-colors rounded-xl px-1 cursor-pointer"
       >
         <div className="flex items-center gap-3 min-w-0">
           <span className="w-10 h-10 rounded-full bg-peach/70 border-[1.5px] border-ink flex items-center justify-center text-lg shrink-0">

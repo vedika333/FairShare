@@ -82,7 +82,7 @@ export function WhoseTurnCard({
           type="button"
           onClick={handleNudge}
           disabled={sending || sentThisSession}
-          className="mt-4 w-full py-2.5 px-4 rounded-full bg-lilac text-ink text-xs font-semibold border-[1.5px] border-ink shadow-[2px_2px_0_0_var(--color-ink)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-55 disabled:pointer-events-none cursor-pointer"
+          className="mt-4 w-full min-h-11 py-2.5 px-4 rounded-full bg-lilac text-ink text-xs font-semibold border-[1.5px] border-ink shadow-[2px_2px_0_0_var(--color-ink)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-55 disabled:pointer-events-none cursor-pointer"
         >
           {sentThisSession
             ? "Gentle reminder sent"

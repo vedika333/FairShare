@@ -52,7 +52,7 @@ export function Header({
             type="button"
             onClick={onCopyCode}
             title="Tap to copy group code"
-            className="px-3 py-1.5 rounded-full bg-card border-[1.5px] border-ink text-xs font-mono font-medium text-ink shadow-[2px_2px_0_0_var(--color-ink)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+            className="min-h-11 px-3.5 py-2 rounded-full bg-card border-[1.5px] border-ink text-xs font-mono font-medium text-ink shadow-[2px_2px_0_0_var(--color-ink)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
           >
             #{code}
           </button>
@@ -63,7 +63,7 @@ export function Header({
             disabled={refreshing}
             aria-label="Refresh group"
             title="Refresh"
-            className="w-8 h-8 rounded-full bg-card border-[1.5px] border-ink flex items-center justify-center text-ink shadow-[2px_2px_0_0_var(--color-ink)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-60 cursor-pointer"
+            className="w-11 h-11 rounded-full bg-card border-[1.5px] border-ink flex items-center justify-center text-ink shadow-[2px_2px_0_0_var(--color-ink)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-60 cursor-pointer"
           >
             <svg
               viewBox="0 0 24 24"
@@ -104,7 +104,7 @@ export function Header({
               key={tab}
               type="button"
               onClick={() => onChangeView(tab)}
-              className={`px-3.5 py-1 rounded-full text-xs font-semibold capitalize transition-colors cursor-pointer ${
+              className={`min-h-11 px-4 py-2 rounded-full text-xs font-semibold capitalize transition-colors cursor-pointer ${
                 view === tab ? "bg-ink text-card" : "text-muted hover:text-ink"
               }`}
             >

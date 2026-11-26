@@ -7,6 +7,7 @@ import { getSession, setSession } from "@/lib/session";
 import type { GroupData, Payment, Transfer } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
+import { Petals } from "@/components/ui/Petals";
 import { Header, type DashboardView } from "@/components/dashboard/Header";
 import { NudgeBanner } from "@/components/dashboard/NudgeBanner";
 import { HeroCard } from "@/components/dashboard/HeroCard";
@@ -23,11 +24,13 @@ import { PaymentDetailSheet } from "@/components/sheets/PaymentDetailSheet";
 export default function DashboardPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
   const [data, setData] = useState<GroupData | null>(null);
+  const [loadedAt, setLoadedAt] = useState(0);
   const [error, setError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [memberId, setMemberId] = useState<string | null>(null);
   const [view, setView] = useState<DashboardView>("activity");
   const [toast, setToast] = useState<string | null>(null);
+  const [petalsActive, setPetalsActive] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [settleTransfer, setSettleTransfer] = useState<Transfer | null>(null);
@@ -36,24 +39,29 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
     setRefreshing(true);
     try {
       const next = await getGroup(code);
+      const saved = getSession();
+      setMemberId(saved?.code === code ? saved.memberId : null);
       setData(next);
+      setLoadedAt(Date.now());
       setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not load group");
+      setError(err instanceof Error ? err.message : "Couldn't reach the server, try again");
     } finally {
       setRefreshing(false);
     }
   }, [code]);
 
-  // Load saved member session and fetch group data on mount + window focus
+  // Fetch group data on mount and whenever the window regains focus
   useEffect(() => {
-    const saved = getSession();
-    setMemberId(saved?.code === code ? saved.memberId : null);
-    loadGroup();
-
+    const timer = window.setTimeout(() => {
+      void loadGroup();
+    }, 0);
     window.addEventListener("focus", loadGroup);
-    return () => window.removeEventListener("focus", loadGroup);
-  }, [code, loadGroup]);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("focus", loadGroup);
+    };
+  }, [loadGroup]);
 
   function handlePickMember(id: string) {
     setSession({ code, memberId: id });
@@ -71,16 +79,25 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
 
   async function handlePaymentAdded() {
     await loadGroup();
+    setPetalsActive(true);
     setToast("Payment added");
   }
 
   if (error) {
     return (
-      <main className="min-h-dvh flex flex-col items-center justify-center px-4 text-center gap-3">
+      <main className="min-h-dvh flex flex-col items-center justify-center px-4 text-center gap-4">
         <p className="font-display italic text-3xl text-rose">{error}</p>
-        <Link href="/" className="text-sm underline text-muted hover:text-ink">
-          Back home
-        </Link>
+        <div className="flex items-center gap-3">
+          <Button variant="soft" onClick={loadGroup}>
+            Try again
+          </Button>
+          <Link
+            href="/"
+            className="min-h-11 inline-flex items-center px-4 text-sm underline text-muted hover:text-ink"
+          >
+            Back home
+          </Link>
+        </div>
       </main>
     );
   }
@@ -119,7 +136,11 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
           />
         ) : (
           <>
-            <NudgeBanner nudges={data.nudges ?? []} currentMemberId={memberId} />
+            <NudgeBanner
+              nudges={data.nudges ?? []}
+              currentMemberId={memberId}
+              now={loadedAt}
+            />
 
             <HeroCard
               stats={data.stats}
@@ -166,14 +187,16 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
           </>
         )}
 
-        <AddPaymentSheet
-          open={addOpen}
-          onClose={() => setAddOpen(false)}
-          code={code}
-          members={data.members}
-          currentMemberId={memberId}
-          onAdded={handlePaymentAdded}
-        />
+        {addOpen && (
+          <AddPaymentSheet
+            open={addOpen}
+            onClose={() => setAddOpen(false)}
+            code={code}
+            members={data.members}
+            currentMemberId={memberId}
+            onAdded={handlePaymentAdded}
+          />
+        )}
 
         <PaymentDetailSheet
           payment={selectedPayment}
@@ -187,6 +210,7 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
           onConfirmDemo={() => setToast("Marked as paid (demo)")}
         />
 
+        <Petals active={petalsActive} onDone={() => setPetalsActive(false)} />
         <Toast message={toast} onDone={() => setToast(null)} />
       </main>
     </div>

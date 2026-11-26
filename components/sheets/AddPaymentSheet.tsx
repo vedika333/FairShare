@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Member } from "@/lib/types";
 import { addPayment } from "@/lib/api";
 import { initials } from "@/lib/format";
@@ -32,15 +32,6 @@ export function AddPaymentSheet({
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-
-  // Reset form fields and pre-select the active session member each time the sheet opens
-  useEffect(() => {
-    if (!open) return;
-    setPaidBy(currentMemberId ?? members[0]?.id ?? "");
-    setAmount("");
-    setNote("");
-    setError("");
-  }, [open, currentMemberId, members]);
 
   const selectedMember = members.find((m) => m.id === paidBy) ?? members[0];
   const payerName = selectedMember?.name ?? "Someone";
@@ -89,7 +80,7 @@ export function AddPaymentSheet({
                   key={m.id}
                   type="button"
                   onClick={() => setPaidBy(m.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border-[1.5px] text-xs font-semibold shrink-0 transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 min-h-11 px-3.5 py-2 rounded-full border-[1.5px] text-xs font-semibold shrink-0 transition-all cursor-pointer ${
                     selected
                       ? "bg-peach border-ink shadow-[2px_2px_0_0_var(--color-ink)]"
                       : "bg-paper border-ink/20 text-muted hover:border-ink/50"
@@ -127,7 +118,7 @@ export function AddPaymentSheet({
                 key={value}
                 type="button"
                 onClick={() => addPreset(value)}
-                className="px-3 py-1 rounded-full bg-paper border-[1.5px] border-ink/25 hover:border-ink text-xs font-mono font-medium text-ink transition-colors cursor-pointer"
+                className="min-h-11 px-3.5 py-2 rounded-full bg-paper border-[1.5px] border-ink/25 hover:border-ink text-xs font-mono font-medium text-ink transition-colors cursor-pointer"
               >
                 +{value}
               </button>

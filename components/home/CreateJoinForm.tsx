@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createGroup, joinGroup } from "@/lib/api";
@@ -10,6 +10,10 @@ import { Button } from "@/components/ui/Button";
 
 const AVATARS = ["🌸", "🐰", "🍑", "🦋", "🍵", "🌙"];
 type Mode = "create" | "join";
+
+const subscribe = () => () => {};
+const getSavedCodeSnapshot = () => getSession()?.code ?? null;
+const getServerSnapshot = () => null;
 
 const inputClass =
   "w-full bg-paper/70 border-[1.5px] border-ink/25 focus:border-rose rounded-xl px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/60 outline-none transition-colors";
@@ -24,13 +28,7 @@ export function CreateJoinForm() {
   const [avatar, setAvatar] = useState(AVATARS[0]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [savedCode, setSavedCode] = useState<string | null>(null);
-
-  // Offer a quick shortcut back if this device already joined a group
-  useEffect(() => {
-    const session = getSession();
-    if (session?.code) setSavedCode(session.code);
-  }, []);
+  const savedCode = useSyncExternalStore(subscribe, getSavedCodeSnapshot, getServerSnapshot);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -72,7 +70,7 @@ export function CreateJoinForm() {
                 setMode(m);
                 setError("");
               }}
-              className={`py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              className={`min-h-11 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 mode === m
                   ? "bg-ink text-card shadow-[1px_1px_0_0_var(--color-rose)]"
                   : "text-muted hover:text-ink"
@@ -119,7 +117,7 @@ export function CreateJoinForm() {
               key={a}
               type="button"
               onClick={() => setAvatar(a)}
-              className={`h-10 rounded-full text-lg flex items-center justify-center border-[1.5px] transition-all cursor-pointer ${
+              className={`h-11 rounded-full text-lg flex items-center justify-center border-[1.5px] transition-all cursor-pointer ${
                 avatar === a
                   ? "bg-peach border-ink scale-105 shadow-[2px_2px_0_0_var(--color-ink)]"
                   : "bg-paper border-ink/15 hover:border-ink/40"
@@ -139,9 +137,9 @@ export function CreateJoinForm() {
         {savedCode && (
           <Link
             href={`/g/${savedCode}`}
-            className="block text-center text-xs font-medium text-muted mt-4 hover:text-rose transition-colors"
+            className="min-h-11 flex items-center justify-center text-xs font-medium text-muted mt-3 hover:text-rose transition-colors"
           >
-            Back to group <span className="font-mono">{savedCode}</span> →
+            Back to group <span className="font-mono ml-1">{savedCode}</span> →
           </Link>
         )}
       </form>

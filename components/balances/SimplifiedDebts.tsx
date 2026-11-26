@@ -52,7 +52,7 @@ export function SimplifiedDebts({
                   <Button
                     variant="soft"
                     onClick={() => onSettle(t)}
-                    className="w-full py-2 text-xs"
+                    className="w-full text-xs"
                   >
                     Settle via PayMe · {formatRupees(t.amount)}
                   </Button>

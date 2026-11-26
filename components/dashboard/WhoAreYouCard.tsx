@@ -26,7 +26,7 @@ export function WhoAreYouCard({ groupName, members, onPickMember }: WhoAreYouCar
             key={member.id}
             type="button"
             onClick={() => onPickMember(member.id)}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-paper border-[1.5px] border-ink/25 hover:border-ink hover:bg-peach/40 transition-all text-left cursor-pointer"
+            className="w-full min-h-11 flex items-center gap-3 px-4 py-3 rounded-2xl bg-paper border-[1.5px] border-ink/25 hover:border-ink hover:bg-peach/40 transition-all text-left cursor-pointer"
           >
             <span className="w-9 h-9 rounded-full bg-peach border-[1.5px] border-ink flex items-center justify-center text-lg shrink-0">
               {member.avatar || initials(member.name)}

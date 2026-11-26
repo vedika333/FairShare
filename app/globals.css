@@ -172,3 +172,46 @@ body {
 .animate-gentle-pulse {
     animation: gentle-pulse 3s ease-in-out infinite;
 }
+
+/* Subtle fade-in for newly rendered expense rows */
+@keyframes row-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-row-fade-in {
+  animation: row-fade-in 0.35s ease-out both;
+}
+
+/* Soft petal float-up animation when a payment is saved */
+@keyframes petal-float {
+  0% {
+    opacity: 0;
+    transform: translateY(0) translateX(0) rotate(0deg) scale(0.8);
+  }
+  18% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-220px) translateX(var(--petal-drift, 18px)) rotate(140deg) scale(1.05);
+  }
+}
+
+.animate-petal-float {
+  animation: petal-float 2s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-gentle-pulse,
+  .animate-row-fade-in,
+  .animate-petal-float {
+    animation: none !important;
+  }
+}

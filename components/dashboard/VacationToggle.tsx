@@ -30,7 +30,7 @@ export function VacationToggle({ code, vacationMode, onToggled }: VacationToggle
       onClick={handleToggle}
       disabled={busy}
       aria-pressed={vacationMode}
-      className={`inline-flex items-center gap-2 px-3 py-1 rounded-xl border-[1.5px] border-dashed border-ink text-xs font-semibold transition-colors cursor-pointer disabled:opacity-60 ${
+      className={`inline-flex items-center gap-2 min-h-11 px-3.5 py-2 rounded-xl border-[1.5px] border-dashed border-ink text-xs font-semibold transition-colors cursor-pointer disabled:opacity-60 ${
         vacationMode ? "bg-sky text-ink" : "bg-card text-muted hover:text-ink"
       }`}
     >
