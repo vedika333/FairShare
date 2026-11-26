@@ -49,3 +49,9 @@ export type Session = {
   code: string;
   memberId: string;
 };
+
+export type Transfer = {
+  from: Balance;
+  to: Balance;
+  amount: number;
+};

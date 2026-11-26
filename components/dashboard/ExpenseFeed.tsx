@@ -5,10 +5,11 @@ import { ExpenseRow } from "./ExpenseRow";
 type ExpenseFeedProps = {
   payments: Payment[];
   members: Member[];
+  onSelectPayment: (payment: Payment) => void;
 };
 
 // Chronological list of group payments (newest first) with a gentle empty state
-export function ExpenseFeed({ payments, members }: ExpenseFeedProps) {
+export function ExpenseFeed({ payments, members, onSelectPayment }: ExpenseFeedProps) {
   const memberById = new Map(members.map((m) => [m.id, m]));
   // API returns payments oldest-first, so reverse a copy for newest-first display
   const newestFirst = [...payments].reverse();
@@ -31,6 +32,7 @@ export function ExpenseFeed({ payments, members }: ExpenseFeedProps) {
               key={payment.id}
               payment={payment}
               payer={memberById.get(payment.paid_by)}
+              onSelect={onSelectPayment}
             />
           ))}
         </ul>

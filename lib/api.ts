@@ -47,3 +47,15 @@ export function joinGroup(payload: {
     body: JSON.stringify(payload),
   });
 }
+
+// Record a new payment made by a member of the group
+export function addPayment(
+  code: string,
+  payload: { paidBy: string; amount: number; note: string }
+): Promise<{ ok: boolean }> {
+  return request<{ ok: boolean }>(`/api/groups/${encodeURIComponent(code)}/payments`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}

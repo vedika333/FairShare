@@ -4,15 +4,19 @@ import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { getGroup } from "@/lib/api";
 import { getSession, setSession } from "@/lib/session";
-import type { GroupData } from "@/lib/types";
-import { Card } from "@/components/ui/Card";
+import type { GroupData, Payment, Transfer } from "@/lib/types";
+import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { Header, type DashboardView } from "@/components/dashboard/Header";
 import { HeroCard } from "@/components/dashboard/HeroCard";
 import { ExpenseFeed } from "@/components/dashboard/ExpenseFeed";
 import { WhoAreYouCard } from "@/components/dashboard/WhoAreYouCard";
+import { BalancesView } from "@/components/balances/BalancesView";
+import { SettleSheet } from "@/components/balances/SettleSheet";
+import { AddPaymentSheet } from "@/components/sheets/AddPaymentSheet";
+import { PaymentDetailSheet } from "@/components/sheets/PaymentDetailSheet";
 
-// Read-only group dashboard: loads group data, tracks the active member, and switches views
+// Group dashboard: wires together Activity, Balances, and the payment/settle sheets
 export default function DashboardPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
   const [data, setData] = useState<GroupData | null>(null);
@@ -21,6 +25,9 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
   const [memberId, setMemberId] = useState<string | null>(null);
   const [view, setView] = useState<DashboardView>("activity");
   const [toast, setToast] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [settleTransfer, setSettleTransfer] = useState<Transfer | null>(null);
 
   const loadGroup = useCallback(async () => {
     setRefreshing(true);
@@ -59,6 +66,11 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
     }
   }
 
+  async function handlePaymentAdded() {
+    await loadGroup();
+    setToast("Payment added");
+  }
+
   if (error) {
     return (
       <main className="min-h-dvh flex flex-col items-center justify-center px-4 text-center gap-3">
@@ -81,7 +93,7 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
   const knownMember = Boolean(memberId && data.members.some((m) => m.id === memberId));
 
   return (
-    <main className="min-h-dvh px-4 py-6 max-w-[420px] mx-auto space-y-5">
+    <main className="min-h-dvh px-4 pt-6 pb-24 max-w-[420px] mx-auto space-y-5">
       <Header
         groupName={data.group.name}
         code={data.group.code}
@@ -104,17 +116,52 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
           <HeroCard stats={data.stats} currentMemberId={memberId} />
 
           {view === "activity" ? (
-            <ExpenseFeed payments={data.payments} members={data.members} />
+            <ExpenseFeed
+              payments={data.payments}
+              members={data.members}
+              onSelectPayment={setSelectedPayment}
+            />
           ) : (
-            <Card className="text-center py-8">
-              <h2 className="font-display text-2xl text-ink">Balances</h2>
-              <p className="text-sm text-muted mt-1.5">
-                Detailed per-person balances and gentle nudges are coming next.
-              </p>
-            </Card>
+            <BalancesView
+              balances={data.stats.balances}
+              currentMemberId={memberId}
+              onSettle={setSettleTransfer}
+            />
           )}
+
+          {/* Floating bottom-right action button */}
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[420px] px-4 flex justify-end pointer-events-none z-30">
+            <Button
+              variant="rose"
+              onClick={() => setAddOpen(true)}
+              className="pointer-events-auto"
+            >
+              + Add Payment
+            </Button>
+          </div>
         </>
       )}
+
+      <AddPaymentSheet
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        code={code}
+        members={data.members}
+        currentMemberId={memberId}
+        onAdded={handlePaymentAdded}
+      />
+
+      <PaymentDetailSheet
+        payment={selectedPayment}
+        members={data.members}
+        onClose={() => setSelectedPayment(null)}
+      />
+
+      <SettleSheet
+        transfer={settleTransfer}
+        onClose={() => setSettleTransfer(null)}
+        onConfirmDemo={() => setToast("Marked as paid (demo)")}
+      />
 
       <Toast message={toast} onDone={() => setToast(null)} />
     </main>

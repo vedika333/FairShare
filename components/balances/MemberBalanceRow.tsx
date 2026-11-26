@@ -1,0 +1,66 @@
+import type { Balance } from "@/lib/types";
+import { formatRupees, initials } from "@/lib/format";
+
+type MemberBalanceRowProps = {
+  balance: Balance;
+  maxAbsNet: number;
+};
+
+// Shows a member's total paid, their net status badge, and a centred balance bar
+export function MemberBalanceRow({ balance, maxAbsNet }: MemberBalanceRowProps) {
+  const { name, avatar, paid, net } = balance;
+  const isOwed = net >= 1;
+  const owes = net <= -1;
+
+  // Percentage width from the centre (0% to 50%) relative to the largest balance in the group
+  const pct = maxAbsNet > 0 ? Math.min(50, (Math.abs(net) / maxAbsNet) * 50) : 0;
+
+  return (
+    <li className="hairline-row py-3 space-y-2">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="w-9 h-9 rounded-full bg-peach/70 border-[1.5px] border-ink flex items-center justify-center text-base shrink-0">
+            {avatar || initials(name)}
+          </span>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-ink truncate">{name}</p>
+            <p className="text-xs text-muted font-mono">paid {formatRupees(paid)}</p>
+          </div>
+        </div>
+
+        {isOwed && (
+          <span className="px-2.5 py-1 rounded-full bg-mint/45 border border-ink/20 font-mono text-xs font-semibold text-ink shrink-0">
+            is owed {formatRupees(net)}
+          </span>
+        )}
+        {owes && (
+          <span className="px-2.5 py-1 rounded-full bg-rose/25 border border-ink/20 font-mono text-xs font-semibold text-ink shrink-0">
+            owes {formatRupees(Math.abs(net))}
+          </span>
+        )}
+        {!isOwed && !owes && (
+          <span className="px-2.5 py-1 rounded-full bg-paper border border-ink/20 text-xs font-medium text-muted shrink-0">
+            all square
+          </span>
+        )}
+      </div>
+
+      {/* Centred bar: negative grows left in rose, positive grows right in mint */}
+      <div className="relative h-2 w-full rounded-full bg-paper border border-ink/15 overflow-hidden">
+        <div className="absolute left-1/2 top-0 bottom-0 w-[1.5px] bg-ink/30 -translate-x-1/2 z-10" />
+        {isOwed && (
+          <div
+            className="absolute top-0 bottom-0 left-1/2 bg-mint rounded-r-full transition-all duration-500"
+            style={{ width: `${pct}%` }}
+          />
+        )}
+        {owes && (
+          <div
+            className="absolute top-0 bottom-0 right-1/2 bg-rose rounded-l-full transition-all duration-500"
+            style={{ width: `${pct}%` }}
+          />
+        )}
+      </div>
+    </li>
+  );
+}
