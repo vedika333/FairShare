@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme inline {
+    --color-paper: #fff4ea;
+    --color-card: #fffbf7;
+    --color-peach: #f9d5c4;
+    --color-rose: #e27d8a;
+    --color-lilac: #d9ccee;
+    --color-ink: #4a3a3f;
+    --color-ink-soft: #8a767c;
+
+    --font-display: var(--font-fraunces);
+    --font-body: var(--font-dm);
+    --font-hand: var(--font-caveat);
+}
+
+body {
+    color: var(--color-ink);
+    font-family: var(--font-body), sans-serif;
+    /* soft "sunset through a window" glow on warm paper */
+    background:
+        radial-gradient(ellipse at 15% 0%, #f9d5c4 0%, transparent 55%),
+        radial-gradient(ellipse at 90% 100%, #e7dcf5 0%, transparent 50%),
+        #fff4ea;
+    background-attachment: fixed;
+}
