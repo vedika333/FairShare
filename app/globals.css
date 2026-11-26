@@ -1,26 +1,174 @@
 @import "tailwindcss";
 
 @theme inline {
-    --color-paper: #fff4ea;
-    --color-card: #fffbf7;
+    --color-paper: #fff8f3;
+    --color-card: #ffffff;
+    --color-ink: #3b2f33;
+    --color-muted: #8a767c;
+    --color-rose: #e8798b;
     --color-peach: #f9d5c4;
-    --color-rose: #e27d8a;
-    --color-lilac: #d9ccee;
-    --color-ink: #4a3a3f;
-    --color-ink-soft: #8a767c;
+    --color-lilac: #cdbef0;
+    --color-mint: #8fd3b6;
+    --color-sky: #cfe3f5;
 
-    --font-display: var(--font-fraunces);
-    --font-body: var(--font-dm);
-    --font-hand: var(--font-caveat);
+    --font-display: var(--font-instrument-serif), Georgia, serif;
+    --font-sans: var(--font-plus-jakarta), system-ui, sans-serif;
+    --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 body {
     color: var(--color-ink);
-    font-family: var(--font-body), sans-serif;
-    /* soft "sunset through a window" glow on warm paper */
-    background:
-        radial-gradient(ellipse at 15% 0%, #f9d5c4 0%, transparent 55%),
-        radial-gradient(ellipse at 90% 100%, #e7dcf5 0%, transparent 50%),
-        #fff4ea;
-    background-attachment: fixed;
+    font-family: var(--font-sans);
+    /* Warm paper background with a very subtle dot grid */
+    background-color: var(--color-paper);
+    background-image: radial-gradient(color-mix(in srgb, var(--color-ink) 9%, transparent) 1px,
+            transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Main card surface with thin ink border and hard offset shadow */
+.focal-card {
+    background-color: var(--color-card);
+    border: 1.5px solid var(--color-ink);
+    border-radius: 24px;
+    box-shadow: 3px 3px 0 0 var(--color-ink);
+}
+
+/* Subtle divider between list items */
+.hairline-row {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+}
+
+.hairline-row:last-child {
+    border-bottom: none;
+}
+
+/* Dashed ticket divider with two round punch notches on the left and right edges */
+.ticket-perforation {
+    position: relative;
+    border-top: 1.5px dashed color-mix(in srgb, var(--color-ink) 22%, transparent);
+    margin-inline: -1.25rem;
+}
+
+.ticket-perforation::before,
+.ticket-perforation::after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background-color: var(--color-paper);
+    border: 1.5px solid var(--color-ink);
+}
+
+.ticket-perforation::before {
+    left: -10px;
+}
+
+.ticket-perforation::after {
+    right: -10px;
+}
+
+/* Hide scrollbars on horizontal lists while keeping scrollability */
+.no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Gentle breathing pulse used for the dramatic fairness ring */
+@keyframes gentle-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.03);
+        opacity: 0.88;
+    }
+}
+
+.animate-gentle-pulse {
+    animation: gentle-pulse 3s ease-in-out infinite;
+}
+
+
+/* Main card surface with thin ink border and hard offset shadow */
+.focal-card {
+    background-color: var(--color-card);
+    border: 1.5px solid var(--color-ink);
+    border-radius: 24px;
+    box-shadow: 3px 3px 0 0 var(--color-ink);
+}
+
+/* Subtle divider between list items */
+.hairline-row {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+}
+
+.hairline-row:last-child {
+    border-bottom: none;
+}
+
+/* Dashed ticket divider with two round punch notches on the left and right edges */
+.ticket-perforation {
+    position: relative;
+    border-top: 1.5px dashed color-mix(in srgb, var(--color-ink) 22%, transparent);
+    margin-inline: -1.25rem;
+}
+
+.ticket-perforation::before,
+.ticket-perforation::after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background-color: var(--color-paper);
+    border: 1.5px solid var(--color-ink);
+}
+
+.ticket-perforation::before {
+    left: -10px;
+}
+
+.ticket-perforation::after {
+    right: -10px;
+}
+
+/* Hide scrollbars on horizontal lists while keeping scrollability */
+.no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Gentle breathing pulse used for the dramatic fairness ring */
+@keyframes gentle-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.03);
+        opacity: 0.88;
+    }
+}
+
+.animate-gentle-pulse {
+    animation: gentle-pulse 3s ease-in-out infinite;
 }
