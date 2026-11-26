@@ -1,15 +1,18 @@
 import type { Stats } from "@/lib/types";
+import { DASHBOARD_COPY } from "@/lib/copy";
 import { formatRupees } from "@/lib/format";
 import { Card } from "@/components/ui/Card";
 import { FairnessRing } from "./FairnessRing";
 
 type HeroCardProps = {
   stats: Stats;
+  vacationMode: boolean;
   currentMemberId: string | null;
 };
 
 // Main ticket-style summary card with total group spend, your balance badge, and the fairness ring
-export function HeroCard({ stats, currentMemberId }: HeroCardProps) {
+export function HeroCard({ stats, vacationMode, currentMemberId }: HeroCardProps) {
+  const copy = vacationMode ? DASHBOARD_COPY.trip : DASHBOARD_COPY.normal;
   const me = stats.balances.find((b) => b.id === currentMemberId);
   const net = me ? me.net : 0;
 
@@ -30,11 +33,12 @@ export function HeroCard({ stats, currentMemberId }: HeroCardProps) {
       <div className="flex items-start justify-between gap-3 pb-5">
         <div>
           <p className="text-xs font-medium uppercase tracking-wider text-muted">
-            Total Group Spend
+            {copy.totalLabel}
           </p>
           <p className="font-display text-5xl leading-none text-ink mt-1.5">
             {formatRupees(stats.totalSpend)}
           </p>
+          <p className="text-xs text-muted mt-1">{copy.heroCaption}</p>
         </div>
 
         <span
@@ -46,7 +50,7 @@ export function HeroCard({ stats, currentMemberId }: HeroCardProps) {
 
       <div className="ticket-perforation" />
 
-      <FairnessRing score={stats.score} mood={stats.mood} />
+      <FairnessRing score={stats.score} vacationMode={vacationMode} />
     </Card>
   );
 }

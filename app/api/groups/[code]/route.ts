@@ -18,9 +18,22 @@ export async function GET(_req: Request, { params }: Ctx) {
   const { data: payments } = await supabase
     .from("payments").select("*").eq("group_id", group.id).order("created_at");
 
+  const { data: nudges } = await supabase
+    .from("nudges")
+    .select("id, from_member, to_member, created_at")
+    .eq("group_id", group.id)
+    .order("created_at", { ascending: false })
+    .limit(10);
+
   const stats = calculateFairness(members ?? [], payments ?? []);
 
-  return NextResponse.json({ group, members: members ?? [], payments: payments ?? [], stats });
+  return NextResponse.json({
+    group,
+    members: members ?? [],
+    payments: payments ?? [],
+    nudges: nudges ?? [],
+    stats,
+  });
 }
 
 // PATCH: toggle Vacation Mode (F8)

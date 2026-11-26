@@ -1,8 +1,9 @@
 import type { Mood } from "@/lib/types";
+import { getMood } from "@/lib/mood";
 
 type FairnessRingProps = {
   score: number;
-  mood: Mood;
+  vacationMode: boolean;
 };
 
 const MOOD_META: Record<Mood, { stroke: string; badgeBg: string; caption: string }> = {
@@ -24,8 +25,9 @@ const MOOD_META: Record<Mood, { stroke: string; badgeBg: string; caption: string
 };
 
 // Circular SVG meter showing the 0-100 fairness score and a mood-matched caption
-export function FairnessRing({ score, mood }: FairnessRingProps) {
+export function FairnessRing({ score, vacationMode }: FairnessRingProps) {
   const clamped = Math.max(0, Math.min(100, score));
+  const mood = getMood(clamped, vacationMode);
   const radius = 46;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (clamped / 100) * circumference;

@@ -59,3 +59,31 @@ export function addPayment(
     body: JSON.stringify(payload),
   });
 }
+
+// Send an anonymous gentle reminder nudge to the next payer
+export function sendNudge(
+  code: string,
+  fromMember: string,
+  toMember: string
+): Promise<{ ok: boolean; message?: string }> {
+  return request<{ ok: boolean; message?: string }>(
+    `/api/groups/${encodeURIComponent(code)}/nudge`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fromMember, toMember }),
+    }
+  );
+}
+
+// Toggle Trip (Vacation) mode on or off for the group
+export function setVacationMode(
+  code: string,
+  on: boolean
+): Promise<{ ok: boolean }> {
+  return request<{ ok: boolean }>(`/api/groups/${encodeURIComponent(code)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ vacationMode: on }),
+  });
+}

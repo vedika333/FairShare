@@ -1,5 +1,7 @@
 import type { Member } from "@/lib/types";
+import { DASHBOARD_COPY } from "@/lib/copy";
 import { initials } from "@/lib/format";
+import { VacationToggle } from "./VacationToggle";
 
 export type DashboardView = "activity" | "balances";
 
@@ -7,6 +9,7 @@ type HeaderProps = {
   groupName: string;
   code: string;
   members: Member[];
+  vacationMode: boolean;
   view: DashboardView;
   onChangeView: (view: DashboardView) => void;
   onCopyCode: () => void;
@@ -14,11 +17,12 @@ type HeaderProps = {
   refreshing: boolean;
 };
 
-// Top header showing group title, member avatars, copyable code chip, refresh button, and view toggle
+// Top header showing group title, trip status, avatars, code chip, trip toggle, and view switch
 export function Header({
   groupName,
   code,
   members,
+  vacationMode,
   view,
   onChangeView,
   onCopyCode,
@@ -26,12 +30,20 @@ export function Header({
   refreshing,
 }: HeaderProps) {
   const countLabel = members.length === 1 ? "1 person" : `${members.length} people`;
+  const tripLabel = vacationMode ? DASHBOARD_COPY.trip.statusLabel : null;
 
   return (
-    <header className="space-y-4">
+    <header className="space-y-3.5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium text-muted">{countLabel} in this circle</p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs font-medium text-muted">{countLabel} in this circle</p>
+            {tripLabel && (
+              <span className="px-2 py-0.5 rounded-full bg-sky border border-ink/40 text-[10px] font-semibold text-ink">
+                {tripLabel}
+              </span>
+            )}
+          </div>
           <h1 className="font-display text-4xl leading-none text-ink mt-1">{groupName}</h1>
         </div>
 
@@ -69,8 +81,7 @@ export function Header({
         </div>
       </div>
 
-      {/* Overlapping member avatar stack */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-2">
         <div className="flex items-center -space-x-2 overflow-x-auto no-scrollbar py-0.5">
           {members.map((m) => (
             <span
@@ -83,8 +94,11 @@ export function Header({
           ))}
         </div>
 
-        {/* Activity / Balances toggle pill */}
-        <div className="inline-flex bg-card p-1 rounded-full border-[1.5px] border-ink shrink-0">
+        <VacationToggle code={code} vacationMode={vacationMode} onToggled={onRefresh} />
+      </div>
+
+      <div className="flex justify-end">
+        <div className="inline-flex bg-card p-1 rounded-full border-[1.5px] border-ink">
           {(["activity", "balances"] as DashboardView[]).map((tab) => (
             <button
               key={tab}

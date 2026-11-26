@@ -38,10 +38,19 @@ export type Stats = {
   nextPayer: Balance | null;
 };
 
+export type Nudge = {
+  id: string;
+  from_member: string | null;
+  to_member: string;
+  created_at: string;
+};
+
+// Matches GET /api/groups/[code] response shape (including the 10 most recent nudges)
 export type GroupData = {
   group: Group;
   members: Member[];
   payments: Payment[];
+  nudges: Nudge[];
   stats: Stats;
 };
 
