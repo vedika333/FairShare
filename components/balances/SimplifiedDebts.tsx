@@ -1,5 +1,5 @@
 import type { Balance, Transfer } from "@/lib/types";
-import { simplifyDebts } from "@/lib/debts";
+import { evenUp } from "@/lib/debts";
 import { formatRupees, initials } from "@/lib/format";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -16,7 +16,7 @@ export function SimplifiedDebts({
   currentMemberId,
   onSettle,
 }: SimplifiedDebtsProps) {
-  const transfers = simplifyDebts(balances);
+  const transfers = evenUp(balances);
 
   return (
     <Card>

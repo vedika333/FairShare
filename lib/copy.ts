@@ -9,7 +9,7 @@ export const HOME_COPY = {
 export const RING_CAPTIONS: Record<Mood, string> = {
   calm: "everything's soft and even ✨",
   tense: "a small cloud has appeared ☁️",
-  dramatic: "episode 7: someone is covering for everyone 🎬",
+  BALANCED: "episode 7: someone is covering for everyone 🎬",
 };
 
 export const TURN_FOOD_EMOJIS = ["🍜", "🧋", "🍰", "🥟", "🍢"];
@@ -41,11 +41,17 @@ export const ROTATION_LOG_COPY = {
 };
 
 export const EVEN_UP_COPY = {
-  title: "Even up",
-  placeholder: "Even up is coming in the next milestone.",
+  title: "Evening things out",
+  empty: "Everyone is even. The group is at peace ✨",
+  standingsTitle: "Where everyone stands",
+  ahead: "ahead",
+  behind: "behind",
+  even: "even",
 };
 
 export const TOAST_COPY = {
   nudgeSent: "Reminder sent. Nobody will know it was you ✨",
+  paymentSaved: "Saved to the rotation log ✨",
+  markedPaidDemo: "Marked as paid (demo) ✨",
   codeCopied: (code: string) => `Copied code #${code} ✨`,
 };

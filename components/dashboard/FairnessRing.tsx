@@ -15,7 +15,7 @@ const MOOD_STYLES: Record<Mood, { stroke: string; badgeBg: string }> = {
     stroke: "var(--color-peach)",
     badgeBg: "bg-peach/65",
   },
-  dramatic: {
+  BALANCED: {
     stroke: "var(--color-rose)",
     badgeBg: "bg-rose/25",
   },
@@ -32,7 +32,7 @@ export function FairnessRing({ score, mood }: FairnessRingProps) {
   return (
     <div className="flex flex-col items-center text-center">
       <div
-        className={`relative w-[180px] h-[180px] ${mood === "dramatic" ? "animate-gentle-pulse" : ""}`}
+        className={`relative w-[180px] h-[180px] ${mood === "BALANCED" ? "animate-gentle-pulse" : ""}`}
       >
         <svg viewBox="0 0 180 180" className="w-full h-full -rotate-90">
           <circle

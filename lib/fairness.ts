@@ -20,7 +20,7 @@ export function calculateFairness(members: Member[], payments: Payment[]) {
   }
   score = Math.max(0, Math.min(100, score));
 
-  const mood = score >= 75 ? "calm" : score >= 40 ? "tense" : "dramatic";
+  const mood = score >= 75 ? "calm" : score >= 40 ? "tense" : "BALANCED";
 
   const sorted = [...balances].sort((a, b) => a.net - b.net);
   const nextPayer = balances.length > 0 ? sorted[0] : null;

@@ -22,7 +22,7 @@ API CONTRACT (already built, do not change):
 GET   /api/groups/[code]  -> { group:{id,code,name,vacation_mode},
         members:[{id,name,avatar}],
         payments:[{id,paid_by,amount,note,created_at}]  (oldest first),
-        stats:{ totalSpend, fairShare, score(0-100), mood:"calm"|"tense"|"dramatic",
+        stats:{ totalSpend, fairShare, score(0-100), mood:"calm"|"tense"|"BALANCED",
                 balances:[{id,name,avatar,paid,net}], nextPayer } }
 PATCH /api/groups/[code]  body {vacationMode:boolean}
 POST  /api/groups/[code]/payments  body {paidBy, amount, note}
@@ -39,4 +39,4 @@ JetBrains Mono for rupee amounts. Use this softer palette instead of black/white
   paper #FFF8F3 | card #FFFFFF | ink #3B2F33 (warm cocoa, used for borders and shadows)
   muted #8A767C | rose #E8798B (main actions) | peach #F9D5C4 | lilac #CDBEF0 (nudge, calm)
   mint #8FD3B6 (only for "all fair") | sky #CFE3F5 (vacation mode)
-Mobile first (about 420px wide). Soft, calm, slightly dramatic copy, never bank-like.
+Mobile first (about 420px wide). Soft, calm, slightly BALANCED copy, never bank-like.

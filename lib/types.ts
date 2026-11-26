@@ -27,7 +27,7 @@ export type Balance = {
   net: number;
 };
 
-export type Mood = "calm" | "tense" | "dramatic";
+export type Mood = "calm" | "tense" | "BALANCED";
 
 export type Stats = {
   totalSpend: number;

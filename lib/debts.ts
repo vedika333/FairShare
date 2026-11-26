@@ -4,50 +4,51 @@ import type { Balance, Transfer } from "./types";
 const round = (n: number) => Math.round(n * 100) / 100;
 
 /**
- * Turns everyone's net balance into the fewest possible "A pays B" transfers.
- * Why greedy: matching the biggest debtor with the biggest creditor at each step
- * clears one person's debt completely and keeps the list short for friends.
+ * Turns everyone's net standing into the fewest possible "A -> B" transfers.
+ * net < 0 means a member is behind (sends money); net > 0 means ahead (receives money).
+ * Why greedy: repeatedly matching the most-behind member with the most-ahead member
+ * clears one person's standing each step and keeps the transfer list short.
  */
-export function simplifyDebts(balances: Balance[]): Transfer[] {
-  // Split members into people who owe money (negative net) and people who are owed (positive net).
-  // Ignore tiny amounts under ₹1 so nobody gets asked to transfer paise.
-  const debtors = balances
+export function evenUp(balances: Balance[]): Transfer[] {
+  // Split into people who are behind (negative net) and people who are ahead (positive net).
+  // Ignore amounts under HK$1 so nobody is asked to transfer paise.
+  const behind = balances
     .filter((b) => b.net <= -1)
     .map((b) => ({ member: b, remaining: round(-b.net) }));
 
-  const creditors = balances
+  const ahead = balances
     .filter((b) => b.net >= 1)
     .map((b) => ({ member: b, remaining: round(b.net) }));
 
   const transfers: Transfer[] = [];
 
-  // Keep matching until either side has nobody left with at least ₹1 to settle
-  while (debtors.length > 0 && creditors.length > 0) {
-    // Pick the person who owes the most and the person owed the most right now
-    debtors.sort((a, b) => b.remaining - a.remaining);
-    creditors.sort((a, b) => b.remaining - a.remaining);
+  // Keep matching until either side has nobody left with at least HK$1 to even up
+  while (behind.length > 0 && ahead.length > 0) {
+    // Pick the most-behind person and the most-ahead person right now
+    behind.sort((a, b) => b.remaining - a.remaining);
+    ahead.sort((a, b) => b.remaining - a.remaining);
 
-    const topDebtor = debtors[0];
-    const topCreditor = creditors[0];
+    const mostBehind = behind[0];
+    const mostAhead = ahead[0];
 
-    // The transfer amount is the smaller of what the debtor owes and what the creditor is owed
-    const amount = round(Math.min(topDebtor.remaining, topCreditor.remaining));
+    // Transfer the smaller of what the sender is behind and what the receiver is ahead
+    const amount = round(Math.min(mostBehind.remaining, mostAhead.remaining));
 
     if (amount >= 1) {
       transfers.push({
-        from: topDebtor.member,
-        to: topCreditor.member,
+        from: mostBehind.member,
+        to: mostAhead.member,
         amount,
       });
     }
 
-    // Subtract the settled amount from both sides
-    topDebtor.remaining = round(topDebtor.remaining - amount);
-    topCreditor.remaining = round(topCreditor.remaining - amount);
+    // Subtract the matched amount from both sides
+    mostBehind.remaining = round(mostBehind.remaining - amount);
+    mostAhead.remaining = round(mostAhead.remaining - amount);
 
-    // Drop anyone whose remaining balance is now under ₹1
-    if (topDebtor.remaining < 1) debtors.shift();
-    if (topCreditor.remaining < 1) creditors.shift();
+    // Drop anyone whose remaining amount is now under HK$1
+    if (mostBehind.remaining < 1) behind.shift();
+    if (mostAhead.remaining < 1) ahead.shift();
   }
 
   return transfers;

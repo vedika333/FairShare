@@ -50,7 +50,7 @@ export function AddPaymentSheet({
       return;
     }
     if (!(numericAmount > 0)) {
-      setError("Enter an amount greater than ₹0.");
+      setError("Enter an amount greater than HK$0.");
       return;
     }
 
@@ -71,7 +71,7 @@ export function AddPaymentSheet({
     <Sheet open={open} onClose={onClose} title="Add a payment">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <p className="text-xs font-medium text-muted mb-2">Who paid?</p>
+          <p className="text-xs font-medium text-muted mb-2">Who covered it?</p>
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
             {members.map((m) => {
               const selected = m.id === paidBy;
@@ -96,7 +96,7 @@ export function AddPaymentSheet({
 
         <div>
           <div className="flex items-center gap-2 bg-paper border-[1.5px] border-ink rounded-2xl px-4 py-3">
-            <span className="font-mono text-2xl text-muted">₹</span>
+            <span className="font-mono text-2xl text-muted">HK$</span>
             <input
               type="number"
               inputMode="decimal"
@@ -138,7 +138,7 @@ export function AddPaymentSheet({
         {error && <p className="text-xs font-medium text-rose">{error}</p>}
 
         <Button type="submit" disabled={busy} className="w-full">
-          {busy ? "Saving…" : `${payerName} paid ♥`}
+          {busy ? "Saving…" : `${payerName} paid 💖`}
         </Button>
       </form>
     </Sheet>

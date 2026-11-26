@@ -3,11 +3,10 @@
 import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { getGroup } from "@/lib/api";
-import { EVEN_UP_COPY, TOAST_COPY } from "@/lib/copy";
+import { TOAST_COPY } from "@/lib/copy";
 import { getSession, setSession } from "@/lib/session";
-import type { GroupData } from "@/lib/types";
+import type { GroupData, Payment, Transfer } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { Toast } from "@/components/ui/Toast";
 import { Header, type DashboardView } from "@/components/dashboard/Header";
 import { NudgeBanner } from "@/components/dashboard/NudgeBanner";
@@ -15,8 +14,12 @@ import { HeroCard } from "@/components/dashboard/HeroCard";
 import { WhoseTurnCard } from "@/components/dashboard/WhoseTurnCard";
 import { RotationLog } from "@/components/dashboard/RotationLog";
 import { WhoAreYouCard } from "@/components/dashboard/WhoAreYouCard";
+import { EvenUpView } from "@/components/evenup/EvenUpView";
+import { AddPaymentSheet } from "@/components/sheets/AddPaymentSheet";
+import { PaymentDetailSheet } from "@/components/sheets/PaymentDetailSheet";
+import { SettleSheet } from "@/components/sheets/SettleSheet";
 
-// Group dashboard: loads group data and renders Header, NudgeBanner, HeroCard, WhoseTurnCard, RotationLog
+// Group dashboard: wires Rotation log, Even up view, and payment/settle sheets
 export default function DashboardPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
   const [data, setData] = useState<GroupData | null>(null);
@@ -26,6 +29,9 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
   const [memberId, setMemberId] = useState<string | null>(null);
   const [view, setView] = useState<DashboardView>("rotation");
   const [toast, setToast] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [settleTransfer, setSettleTransfer] = useState<Transfer | null>(null);
 
   const loadGroup = useCallback(async () => {
     setRefreshing(true);
@@ -69,6 +75,11 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
     }
   }
 
+  async function handlePaymentAdded() {
+    await loadGroup();
+    setToast(TOAST_COPY.paymentSaved);
+  }
+
   if (error) {
     return (
       <main className="min-h-dvh flex flex-col items-center justify-center px-4 text-center gap-4">
@@ -99,7 +110,7 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
   const knownMember = Boolean(memberId && data.members.some((m) => m.id === memberId));
 
   return (
-    <main className="min-h-dvh px-4 pt-6 pb-12 max-w-[420px] mx-auto space-y-5">
+    <main className="min-h-dvh px-4 pt-6 pb-24 max-w-[420px] mx-auto space-y-5">
       <Header
         groupName={data.group.name}
         code={data.group.code}
@@ -118,10 +129,11 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
           onPickMember={handlePickMember}
         />
       ) : view === "even-up" ? (
-        <Card className="text-center py-8">
-          <h2 className="font-display text-2xl text-ink">{EVEN_UP_COPY.title}</h2>
-          <p className="text-sm text-muted mt-1.5">{EVEN_UP_COPY.placeholder}</p>
-        </Card>
+        <EvenUpView
+          balances={data.stats.balances}
+          currentMemberId={memberId}
+          onSettle={setSettleTransfer}
+        />
       ) : (
         <>
           <NudgeBanner
@@ -145,9 +157,48 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
             onNudgeSent={setToast}
           />
 
-          <RotationLog payments={data.payments} members={data.members} />
+          <RotationLog
+            payments={data.payments}
+            members={data.members}
+            onSelectPayment={setSelectedPayment}
+          />
         </>
       )}
+
+      {knownMember && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[420px] px-4 flex justify-end pointer-events-none z-30">
+          <Button
+            variant="rose"
+            onClick={() => setAddOpen(true)}
+            className="pointer-events-auto"
+          >
+            + Add payment
+          </Button>
+        </div>
+      )}
+
+      {addOpen && (
+        <AddPaymentSheet
+          open={addOpen}
+          onClose={() => setAddOpen(false)}
+          code={code}
+          members={data.members}
+          currentMemberId={memberId}
+          onAdded={handlePaymentAdded}
+        />
+      )}
+
+      <PaymentDetailSheet
+        payment={selectedPayment}
+        members={data.members}
+        onClose={() => setSelectedPayment(null)}
+      />
+
+      <SettleSheet
+        transfer={settleTransfer}
+        onClose={() => setSettleTransfer(null)}
+        onConfirmDemo={() => setToast(TOAST_COPY.markedPaidDemo)}
+      />
 
       <Toast message={toast} onDone={() => setToast(null)} />
     </main>

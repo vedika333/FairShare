@@ -1,5 +1,5 @@
 // Seeds a demo group ("Canteen Crew") with 5 members and 8 uneven payments
-// so the fairness ring starts in the "dramatic" state.
+// so the fairness ring starts in the "BALANCED" state.
 // Run with the Next.js dev server running: npm run seed
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
@@ -29,7 +29,7 @@ async function main() {
   const kabir = await post("/api/groups/join", { code, yourName: "Kabir", avatar: "🌙" });
   await post("/api/groups/join", { code, yourName: "Diya", avatar: "🍑" });
 
-  // 8 uneven payments where Aanya covers most of the bills (score ~ 10, "dramatic")
+  // 8 uneven payments where Aanya covers most of the bills (score ~ 10, "BALANCED")
   const payments = [
     { paidBy: aanyaId, amount: 1200, note: "Friday canteen feast" },
     { paidBy: rohan.memberId, amount: 150, note: "Masala chai round" },
