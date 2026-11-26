@@ -3,6 +3,12 @@
 import { useState } from "react";
 import type { Balance } from "@/lib/types";
 import { sendNudge } from "@/lib/api";
+import {
+  TOAST_COPY,
+  TURN_COPY,
+  TURN_FOOD_EMOJIS,
+  WHOSE_TURN_LINES,
+} from "@/lib/copy";
 import { initials } from "@/lib/format";
 import { Card } from "@/components/ui/Card";
 
@@ -15,13 +21,7 @@ type WhoseTurnCardProps = {
   onNudgeSent: (message: string) => void;
 };
 
-const FUNNY_LINES = [
-  "they've been freeloading (lovingly)",
-  "the wallet has been resting long enough",
-  "a gentle hint from the universe",
-];
-
-// Tilted spotlight card showing whose turn it is to pay next, with an anonymous nudge button
+// Tilted spotlight card showing whose turn it is next, with an anonymous reminder button
 export function WhoseTurnCard({
   code,
   nextPayer,
@@ -36,15 +36,14 @@ export function WhoseTurnCard({
   if (!hasPayments || !nextPayer) {
     return (
       <Card className="text-center py-5 bg-peach/30">
-        <p className="font-display italic text-xl text-ink">
-          Nobody has paid yet. Be the first hero.
-        </p>
+        <p className="font-display italic text-xl text-ink">{TURN_COPY.emptyState}</p>
       </Card>
     );
   }
 
   const isMe = nextPayer.id === currentMemberId;
-  const line = FUNNY_LINES[paymentCount % FUNNY_LINES.length];
+  const foodEmoji = TURN_FOOD_EMOJIS[paymentCount % TURN_FOOD_EMOJIS.length];
+  const funnyLine = WHOSE_TURN_LINES[paymentCount % WHOSE_TURN_LINES.length];
 
   async function handleNudge() {
     if (!currentMemberId || !nextPayer || sending || sentThisSession) return;
@@ -52,9 +51,11 @@ export function WhoseTurnCard({
     try {
       await sendNudge(code, currentMemberId, nextPayer.id);
       setSentThisSession(true);
-      onNudgeSent("Reminder sent. Nobody will know it was you");
+      onNudgeSent(TOAST_COPY.nudgeSent);
     } catch (err) {
-      onNudgeSent(err instanceof Error ? err.message : "Could not send reminder");
+      onNudgeSent(
+        err instanceof Error ? err.message : "Couldn't reach the server, try again"
+      );
     } finally {
       setSending(false);
     }
@@ -69,10 +70,10 @@ export function WhoseTurnCard({
 
         <div className="min-w-0">
           <h2 className="font-display text-2xl leading-tight text-ink">
-            {isMe ? "It's your turn" : `${nextPayer.name}'s turn`}
+            {isMe ? "It's your turn" : `${nextPayer.name}'s turn ${foodEmoji}`}
           </h2>
           <p className="text-xs text-muted mt-0.5">
-            {isMe ? "you're up next when the next bill lands" : line}
+            {isMe ? TURN_COPY.yourTurnLine : funnyLine}
           </p>
         </div>
       </div>
@@ -85,10 +86,10 @@ export function WhoseTurnCard({
           className="mt-4 w-full min-h-11 py-2.5 px-4 rounded-full bg-lilac text-ink text-xs font-semibold border-[1.5px] border-ink shadow-[2px_2px_0_0_var(--color-ink)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-55 disabled:pointer-events-none cursor-pointer"
         >
           {sentThisSession
-            ? "Gentle reminder sent"
+            ? TURN_COPY.nudgeButtonSent
             : sending
               ? "Sending…"
-              : "Send a gentle reminder"}
+              : TURN_COPY.nudgeButton}
         </button>
       )}
     </Card>

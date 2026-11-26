@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createGroup, joinGroup } from "@/lib/api";
+import { HOME_COPY } from "@/lib/copy";
 import { getSession, setSession } from "@/lib/session";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -52,13 +53,13 @@ export function CreateJoinForm() {
   return (
     <Card className="p-6">
       <form onSubmit={handleSubmit}>
-        <p className="text-xs font-semibold uppercase tracking-widest text-rose">fairshare</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-rose">
+          fairshare {HOME_COPY.logoEmoji}
+        </p>
         <h1 className="font-display text-4xl leading-[1.05] mt-1.5 text-ink">
           Nobody has to be the bad guy.
         </h1>
-        <p className="text-sm text-muted mt-2">
-          A gentle way to keep &ldquo;who pays this time?&rdquo; fair for everyone.
-        </p>
+        <p className="text-sm text-muted mt-2">{HOME_COPY.pitch}</p>
 
         {/* Create / Join toggle */}
         <div className="grid grid-cols-2 gap-1.5 bg-paper p-1 rounded-full border-[1.5px] border-ink/20 mt-6">

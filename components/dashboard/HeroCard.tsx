@@ -1,56 +1,37 @@
-import type { Stats } from "@/lib/types";
-import { DASHBOARD_COPY } from "@/lib/copy";
+import type { Payment, Stats } from "@/lib/types";
 import { formatRupees } from "@/lib/format";
 import { Card } from "@/components/ui/Card";
 import { FairnessRing } from "./FairnessRing";
 
 type HeroCardProps = {
   stats: Stats;
-  vacationMode: boolean;
+  payments: Payment[];
   currentMemberId: string | null;
 };
 
-// Main ticket-style summary card with total group spend, your balance badge, and the fairness ring
-export function HeroCard({ stats, vacationMode, currentMemberId }: HeroCardProps) {
-  const copy = vacationMode ? DASHBOARD_COPY.trip : DASHBOARD_COPY.normal;
-  const me = stats.balances.find((b) => b.id === currentMemberId);
-  const net = me ? me.net : 0;
-
-  let badgeText = "You're all square";
-  let badgeClass = "bg-mint/40 text-ink";
-
-  // Small threshold avoids floating-point noise showing "₹0.00"
-  if (net > 0.5) {
-    badgeText = `You are owed ${formatRupees(net)}`;
-    badgeClass = "bg-lilac/60 text-ink";
-  } else if (net < -0.5) {
-    badgeText = `You owe ${formatRupees(Math.abs(net))}`;
-    badgeClass = "bg-peach/80 text-ink";
-  }
+// Hero card featuring the 180px fairness ring, total covered line, and recent rounds count
+export function HeroCard({ stats, payments, currentMemberId }: HeroCardProps) {
+  const recentRounds = payments.slice(-4);
+  const coveredByMe = recentRounds.filter((p) => p.paid_by === currentMemberId).length;
 
   return (
-    <Card>
-      <div className="flex items-start justify-between gap-3 pb-5">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-muted">
-            {copy.totalLabel}
-          </p>
-          <p className="font-display text-5xl leading-none text-ink mt-1.5">
+    <Card className="space-y-4">
+      <div className="flex flex-col items-center">
+        <FairnessRing score={stats.score} mood={stats.mood} />
+        <p className="text-xs text-muted mt-3">
+          Total covered so far:{" "}
+          <span className="font-mono font-medium text-ink">
             {formatRupees(stats.totalSpend)}
-          </p>
-          <p className="text-xs text-muted mt-1">{copy.heroCaption}</p>
-        </div>
-
-        <span
-          className={`px-3 py-1.5 rounded-full border-[1.5px] border-ink text-xs font-semibold shrink-0 ${badgeClass}`}
-        >
-          {badgeText}
-        </span>
+          </span>
+        </p>
       </div>
 
       <div className="ticket-perforation" />
 
-      <FairnessRing score={stats.score} vacationMode={vacationMode} />
+      <p className="text-center text-xs font-medium text-ink">
+        You&apos;ve covered {coveredByMe} of the last {recentRounds.length}{" "}
+        {recentRounds.length === 1 ? "round" : "rounds"}
+      </p>
     </Card>
   );
 }

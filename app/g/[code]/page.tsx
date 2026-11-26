@@ -3,24 +3,20 @@
 import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { getGroup } from "@/lib/api";
+import { EVEN_UP_COPY, TOAST_COPY } from "@/lib/copy";
 import { getSession, setSession } from "@/lib/session";
-import type { GroupData, Payment, Transfer } from "@/lib/types";
+import type { GroupData } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { Toast } from "@/components/ui/Toast";
-import { Petals } from "@/components/ui/Petals";
 import { Header, type DashboardView } from "@/components/dashboard/Header";
 import { NudgeBanner } from "@/components/dashboard/NudgeBanner";
 import { HeroCard } from "@/components/dashboard/HeroCard";
 import { WhoseTurnCard } from "@/components/dashboard/WhoseTurnCard";
-import { RotationTimeline } from "@/components/dashboard/RotationTimeline";
-import { ExpenseFeed } from "@/components/dashboard/ExpenseFeed";
+import { RotationLog } from "@/components/dashboard/RotationLog";
 import { WhoAreYouCard } from "@/components/dashboard/WhoAreYouCard";
-import { BalancesView } from "@/components/balances/BalancesView";
-import { SettleSheet } from "@/components/balances/SettleSheet";
-import { AddPaymentSheet } from "@/components/sheets/AddPaymentSheet";
-import { PaymentDetailSheet } from "@/components/sheets/PaymentDetailSheet";
 
-// Group dashboard: wires together Activity, Balances, nudges, timeline, and trip mode
+// Group dashboard: loads group data and renders Header, NudgeBanner, HeroCard, WhoseTurnCard, RotationLog
 export default function DashboardPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
   const [data, setData] = useState<GroupData | null>(null);
@@ -28,12 +24,8 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
   const [error, setError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [memberId, setMemberId] = useState<string | null>(null);
-  const [view, setView] = useState<DashboardView>("activity");
+  const [view, setView] = useState<DashboardView>("rotation");
   const [toast, setToast] = useState<string | null>(null);
-  const [petalsActive, setPetalsActive] = useState(false);
-  const [addOpen, setAddOpen] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
-  const [settleTransfer, setSettleTransfer] = useState<Transfer | null>(null);
 
   const loadGroup = useCallback(async () => {
     setRefreshing(true);
@@ -71,16 +63,10 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
   async function handleCopyCode() {
     try {
       await navigator.clipboard.writeText(code);
-      setToast(`Copied code #${code}`);
+      setToast(TOAST_COPY.codeCopied(code));
     } catch {
       setToast(`Group code: #${code}`);
     }
-  }
-
-  async function handlePaymentAdded() {
-    await loadGroup();
-    setPetalsActive(true);
-    setToast("Payment added");
   }
 
   if (error) {
@@ -111,108 +97,59 @@ export default function DashboardPage({ params }: { params: Promise<{ code: stri
   }
 
   const knownMember = Boolean(memberId && data.members.some((m) => m.id === memberId));
-  const vacationMode = data.group.vacation_mode;
 
   return (
-    <div className={`min-h-dvh transition-colors duration-300 ${vacationMode ? "bg-sky/45" : ""}`}>
-      <main className="px-4 pt-6 pb-24 max-w-[420px] mx-auto space-y-5">
-        <Header
+    <main className="min-h-dvh px-4 pt-6 pb-12 max-w-[420px] mx-auto space-y-5">
+      <Header
+        groupName={data.group.name}
+        code={data.group.code}
+        members={data.members}
+        view={view}
+        onChangeView={setView}
+        onCopyCode={handleCopyCode}
+        onRefresh={loadGroup}
+        refreshing={refreshing}
+      />
+
+      {!knownMember ? (
+        <WhoAreYouCard
           groupName={data.group.name}
-          code={data.group.code}
           members={data.members}
-          vacationMode={vacationMode}
-          view={view}
-          onChangeView={setView}
-          onCopyCode={handleCopyCode}
-          onRefresh={loadGroup}
-          refreshing={refreshing}
+          onPickMember={handlePickMember}
         />
-
-        {!knownMember ? (
-          <WhoAreYouCard
-            groupName={data.group.name}
-            members={data.members}
-            onPickMember={handlePickMember}
-          />
-        ) : (
-          <>
-            <NudgeBanner
-              nudges={data.nudges ?? []}
-              currentMemberId={memberId}
-              now={loadedAt}
-            />
-
-            <HeroCard
-              stats={data.stats}
-              vacationMode={vacationMode}
-              currentMemberId={memberId}
-            />
-
-            {view === "activity" ? (
-              <>
-                <WhoseTurnCard
-                  code={code}
-                  nextPayer={data.stats.nextPayer}
-                  hasPayments={data.payments.length > 0}
-                  paymentCount={data.payments.length}
-                  currentMemberId={memberId}
-                  onNudgeSent={setToast}
-                />
-
-                <RotationTimeline payments={data.payments} members={data.members} />
-
-                <ExpenseFeed
-                  payments={data.payments}
-                  members={data.members}
-                  onSelectPayment={setSelectedPayment}
-                />
-              </>
-            ) : (
-              <BalancesView
-                balances={data.stats.balances}
-                currentMemberId={memberId}
-                onSettle={setSettleTransfer}
-              />
-            )}
-
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[420px] px-4 flex justify-end pointer-events-none z-30">
-              <Button
-                variant="rose"
-                onClick={() => setAddOpen(true)}
-                className="pointer-events-auto"
-              >
-                + Add Payment
-              </Button>
-            </div>
-          </>
-        )}
-
-        {addOpen && (
-          <AddPaymentSheet
-            open={addOpen}
-            onClose={() => setAddOpen(false)}
-            code={code}
-            members={data.members}
+      ) : view === "even-up" ? (
+        <Card className="text-center py-8">
+          <h2 className="font-display text-2xl text-ink">{EVEN_UP_COPY.title}</h2>
+          <p className="text-sm text-muted mt-1.5">{EVEN_UP_COPY.placeholder}</p>
+        </Card>
+      ) : (
+        <>
+          <NudgeBanner
+            nudges={data.nudges ?? []}
             currentMemberId={memberId}
-            onAdded={handlePaymentAdded}
+            now={loadedAt}
           />
-        )}
 
-        <PaymentDetailSheet
-          payment={selectedPayment}
-          members={data.members}
-          onClose={() => setSelectedPayment(null)}
-        />
+          <HeroCard
+            stats={data.stats}
+            payments={data.payments}
+            currentMemberId={memberId}
+          />
 
-        <SettleSheet
-          transfer={settleTransfer}
-          onClose={() => setSettleTransfer(null)}
-          onConfirmDemo={() => setToast("Marked as paid (demo)")}
-        />
+          <WhoseTurnCard
+            code={code}
+            nextPayer={data.stats.nextPayer}
+            hasPayments={data.payments.length > 0}
+            paymentCount={data.payments.length}
+            currentMemberId={memberId}
+            onNudgeSent={setToast}
+          />
 
-        <Petals active={petalsActive} onDone={() => setPetalsActive(false)} />
-        <Toast message={toast} onDone={() => setToast(null)} />
-      </main>
-    </div>
+          <RotationLog payments={data.payments} members={data.members} />
+        </>
+      )}
+
+      <Toast message={toast} onDone={() => setToast(null)} />
+    </main>
   );
 }
