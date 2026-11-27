@@ -1,10 +1,10 @@
-// Format a number in Indian Rupees, dropping decimals for whole numbers
+// Format a number in Hong Kong Dollars, dropping decimals for whole numbers
 export function formatRupees(amount: number): string {
   const rounded = Math.round(amount * 100) / 100;
   const hasDecimals = rounded % 1 !== 0;
-  return new Intl.NumberFormat("en-IN", {
+  return new Intl.NumberFormat("en-HK", {
     style: "currency",
-    currency: "INR",
+    currency: "HKD",
     minimumFractionDigits: hasDecimals ? 2 : 0,
     maximumFractionDigits: hasDecimals ? 2 : 0,
   }).format(rounded);
