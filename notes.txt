@@ -1,5 +1,0 @@
-app/api/groups/route.ts                     → POST  create group
-app/api/groups/join/route.ts                → POST  join group
-app/api/groups/[code]/route.ts              → GET   full group state, PATCH vacation mode
-app/api/groups/[code]/payments/route.ts     → POST  add payment
-app/api/groups/[code]/nudge/route.ts        → POST  send nudge
