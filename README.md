@@ -2,7 +2,7 @@
 
 ### Splitwise tells you who owes what. FairShare tells you whose turn it is.
 
-**Live demo:** https://your-vercel-link.vercel.app  *(replace with your Vercel link)*
+**Live demo:** https://fairshare-zeta-nine.vercel.app/  *(replace with your Vercel link)*
 **Demo group code:** `000000`  *(replace with a seeded group so judges can look around right away)*
 
 Built for the **SMBP FinHack** (Finance Track).
